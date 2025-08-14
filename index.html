@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Happy Birthday Rudra</title>
+<style>
+    body {
+        background: #0d0d0d;
+        color: white;
+        font-family: 'Courier New', monospace;
+        text-align: center;
+        padding: 40px;
+        margin: 0;
+        min-height: 100vh;
+        overflow-x: hidden;
+        position: relative;
+    }
+
+    h1 {
+        font-size: 2.5rem;
+        color: #ff3131;
+        animation: glitch 1.5s infinite;
+        margin-bottom: 20px;
+        z-index: 2;
+        position: relative;
+    }
+
+    @keyframes glitch {
+        0% { text-shadow: 2px 2px #ff0000, -2px -2px #00ffff; }
+        25% { text-shadow: -2px 2px #ff0000, 2px -2px #00ffff; }
+        50% { text-shadow: 2px -2px #ff0000, -2px 2px #00ffff; }
+        75% { text-shadow: -2px -2px #ff0000, 2px 2px #00ffff; }
+        100% { text-shadow: 2px 2px #ff0000, -2px -2px #00ffff; }
+    }
+
+    p {
+        font-size: 1.2rem;
+        max-width: 600px;
+        margin: auto;
+        line-height: 1.5;
+        color: #ddd;
+        z-index: 2;
+        position: relative;
+    }
+
+    .surprise {
+        margin-top: 30px;
+        display: none;
+        font-size: 1.3rem;
+        color: #00ff99;
+        font-weight: bold;
+        z-index: 2;
+        position: relative;
+    }
+
+    .icon {
+        font-size: 2rem;
+        cursor: pointer;
+        margin-top: 50px;
+        display: inline-block;
+        padding: 15px;
+        border: 2px solid #ff3131;
+        border-radius: 10px;
+        transition: 0.3s;
+        z-index: 2;
+        position: relative;
+    }
+
+    .icon:hover {
+        background: #ff3131;
+        color: black;
+        transform: scale(1.1);
+    }
+
+    canvas {
+        position: absolute;
+        top: 0;
+        left: 0;
+        pointer-events: none;
+        z-index: 1;
+    }
+
+    .hearts {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        pointer-events: none;
+        z-index: 1;
+    }
+
+    .heart {
+        position: absolute;
+        color: #ff4d6d;
+        font-size: 16px;
+        animation: fall linear forwards;
+    }
+
+    @keyframes fall {
+        0% { transform: translateY(-10px) rotate(0deg); opacity: 1; }
+        100% { transform: translateY(100vh) rotate(360deg); opacity: 0; }
+    }
+
+    #gameContainer {
+        margin-top: 40px;
+        z-index: 2;
+        position: relative;
+    }
+
+    #gameContainer h2 {
+        font-size: 1.8rem;
+        color: #ff99cc;
+        margin-bottom: 10px;
+    }
+
+    #gameContainer p {
+        font-size: 1.2rem;
+        color: #00ffcc;
+    }
+
+    #gameHeart {
+        position: absolute;
+        font-size: 50px;
+        cursor: pointer;
+        user-select: none;
+        transition: transform 0.1s;
+        z-index: 9999;
+    }
+
+    #gameHeart:hover {
+        transform: scale(1.2);
+    }
+
+</style>
+</head>
+<body>
+
+<canvas id="fireworks"></canvas>
+<div class="hearts" id="heartsContainer"></div>
+
+<h1>Happy Birthday Rudra ❤️</h1>
+
+<p>
+    Another year, another level unlocked in this crazy adventure we call life.  
+    I’m just glad I get to run through every glitch, every chaos, and every victory with you.  
+    You’ve got the high score in my heart, and no one’s beating it anytime soon.
+</p>
+
+<div class="icon" onclick="showSurprise()">🎮 Click me</div>
+<div class="surprise" id="surpriseMessage">
+    Surprise, Rudra! 🎉 You’re my favorite plot twist, my forever teammate, and my best upgrade.
+</div>
+
+<div id="gameContainer">
+    <h2>🎯 Catch the Heart Game!</h2>
+    <p>Click the heart as fast as you can! Score: <span id="score">0</span> | Time left: <span id="timeLeft">30</span>s</p>
+    <div id="gameHeart">💖</div>
+</div>
+
+<script>
+// ===== Surprise hearts =====
+function showSurprise() {
+    document.getElementById('surpriseMessage').style.display = 'block';
+    startHearts();
+}
+
+function startHearts() {
+    const container = document.getElementById('heartsContainer');
+    setInterval(() => {
+        const heart = document.createElement('div');
+        heart.classList.add('heart');
+        heart.textContent = '❤️';
+        heart.style.left = Math.random() * 100 + 'vw';
+        heart.style.animationDuration = (Math.random() * 3 + 2) + 's';
+        heart.style.fontSize = (Math.random() * 10 + 12) + 'px';
+        container.appendChild(heart);
+        setTimeout(() => heart.remove(), 5000);
+    }, 300);
+}
+
+// ===== Fireworks =====
+const canvas = document.getElementById('fireworks');
+const ctx = canvas.getContext('2d');
+let particles = [];
+
+function resizeCanvas() {
+    canvas.width = document.documentElement.scrollWidth;
+    canvas.height = document.documentElement.scrollHeight;
+}
+window.addEventListener('resize', resizeCanvas);
+resizeCanvas();
+
+function createFirework(x, y) {
+    const colors = ['#ff3131', '#00ffff', '#ffff00', '#ff00ff', '#00ff99'];
+    for (let i = 0; i < 50; i++) {
+        particles.push({
+            x, y,
+            angle: Math.random() * 2 * Math.PI,
+            speed: Math.random() * 5 + 2,
+            radius: Math.random() * 2 + 1,
+            color: colors[Math.floor(Math.random() * colors.length)],
+            life: 100
+        });
+    }
+}
+
+function drawFireworks() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    particles.forEach((p, index) => {
+        p.x += Math.cos(p.angle) * p.speed;
+        p.y += Math.sin(p.angle) * p.speed;
+        p.speed *= 0.95;
+        p.life--;
+
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
+        ctx.fillStyle = p.color;
+        ctx.fill();
+
+        if (p.life <= 0) particles.splice(index, 1);
+    });
+    requestAnimationFrame(drawFireworks);
+}
+drawFireworks();
+
+document.addEventListener('click', e => createFirework(e.clientX, e.clientY + window.scrollY));
+
+// ===== Mini-game =====
+let score = 0;
+const maxScore = 10;
+let timeLeft = 30;
+const gameHeart = document.getElementById('gameHeart');
+const scoreDisplay = document.getElementById('score');
+const timeDisplay = document.getElementById('timeLeft');
+let canClick = true;
+
+function moveHeart() {
+    const maxX = window.innerWidth - gameHeart.offsetWidth;
+    const maxY = window.innerHeight - gameHeart.offsetHeight;
+    const x = Math.random() * maxX;
+    const y = Math.random() * maxY;
+    gameHeart.style.left = x + 'px';
+    gameHeart.style.top = y + 'px';
+}
+
+gameHeart.addEventListener('click', () => {
+    if (timeLeft > 0 && canClick) {
+        score++;
+        scoreDisplay.textContent = score;
+        canClick = false;
+        setTimeout(() => {
+            if (score >= maxScore) {
+                endGame();
+            } else {
+                moveHeart();
+                canClick = true;
+            }
+        }, 50);
+    }
+});
+
+function endGame() {
+    gameHeart.style.display = 'none';
+    clearInterval(timer);
+    // 🎯 Playful, suggestive win message
+    alert('🔥 Baby, 10/10 – you caught me… now I’m yours completely 😏💖');
+}
+
+const timer = setInterval(() => {
+    if (timeLeft > 0) {
+        timeLeft--;
+        timeDisplay.textContent = timeLeft;
+    } else {
+        clearInterval(timer);
+        if (score < maxScore) alert('Time’s up! Your score: ' + score + ' 🎉');
+        gameHeart.style.display = 'none';
+    }
+}, 1000);
+
+window.onload = () => moveHeart();
+</script>
+
+</body>
+</html>
